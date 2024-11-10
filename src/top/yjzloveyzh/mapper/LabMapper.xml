@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.yjzloveyzh.dao.LabDao">
+  <select id="getLab" resultMap="lab">
+    SELECT lab.id AS lab_id, lab.name AS lab_name,lab.brief AS lab_brief, lab.user_id AS lab_user_id, lab.updated_at AS lab_updated_at, lab.created_at AS lab_created_at,
+     user.*
+    FROM lab, user
+    WHERE lab.user_id = user.id
+  </select>
+
+  <select id="getStatisticsInfo" resultMap="lab_eq">
+    SELECT name, count(1) AS count
+    FROM equipment
+    WHERE is_deleted = 0
+    <choose>
+      <when test="labId > 0">
+        AND equipment.lab_id = #{labId}
+      </when>
+    </choose>
+    GROUP BY name
+    ORDER BY count DESC
+    LIMIT 9
+  </select>
+
+  <select id="getLabEquipmentTotalCount" resultType="int">
+    SELECT count(1) AS count
+    FROM equipment
+    WHERE is_deleted = 0
+    <choose>
+      <when test="labId > 0">
+        AND equipment.lab_id = #{labId}
+      </when>
+    </choose>
+  </select>
+  
+  <select id="getLabInfoById" resultMap="lab">
+    SELECT lab.id AS lab_id, lab.name AS lab_name, lab.user_id AS lab_user_id, lab.updated_at AS lab_updated_at, lab.created_at AS lab_created_at,
+     user.*
+    FROM lab, user
+    WHERE lab.user_id = user.id
+    AND lab.id = #{labId}
+  </select>
+
+  <resultMap type="top.yjzloveyzh.common.pojo.Lab" id="lab">
+    <id column="lab_id" property="id" />
+    <result column="lab_name" property="name" />
+    <result column="lab_updatedAt" property="updatedAt" />
+    <result column="lab_createdAt" property="createdAt" />
+    <result column="lab_user_id" property="userId" />
+    <result column="lab_brief" property="brief" />
+    <association property="manager" javaType="top.yjzloveyzh.common.pojo.User" resultMap="user"></association>
+  </resultMap>
+
+  <resultMap type="top.yjzloveyzh.common.pojo.User" id="user">
+    <id column="id" property="id" />
+    <result column="username" property="username" />
+    <result column="gender" property="gender" />
+    <result column="email" property="email" />
+    <result column="name" property="name" />
+    <result column="address" property="address" />
+    <result column="area" property="area" />
+    <result column="tel_phone" property="telPhone" />
+    <result column="zip_code" property="zipCode" />
+  </resultMap>
+  
+  <resultMap type="top.yjzloveyzh.common.pojo.LabEquipmentCount" id="lab_eq">
+    <result column="name" property="equipmentName"/>
+    <result column="count" property="count"/>
+  </resultMap>
+</mapper>

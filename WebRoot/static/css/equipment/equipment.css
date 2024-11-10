@@ -1,0 +1,10 @@
+@CHARSET "UTF-8";
+.lab-select {
+  height: 22px;
+  line-height: 22px;
+}
+
+.alert {
+  width: 80%;
+  margin: 20px auto;
+}

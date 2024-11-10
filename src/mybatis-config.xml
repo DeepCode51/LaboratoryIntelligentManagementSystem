@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+  <mappers>
+    <mapper resource="top/yjzloveyzh/mapper/LabMapper.xml" />
+    <mapper resource="top/yjzloveyzh/mapper/UserMapper.xml" />
+    <mapper resource="top/yjzloveyzh/mapper/EquipmentMapper.xml" />
+    <mapper resource="top/yjzloveyzh/mapper/RecordMapper.xml" />
+    <mapper resource="top/yjzloveyzh/mapper/DeleteRecordMappper.xml" />
+  </mappers>
+</configuration>

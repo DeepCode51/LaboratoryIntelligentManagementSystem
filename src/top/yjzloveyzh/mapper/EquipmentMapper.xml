@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.yjzloveyzh.dao.EquipmentDao">
+
+  <insert id="insertRequestEquipment" parameterType="top.yjzloveyzh.common.pojo.RequestEquipment" 
+    keyProperty="id" useGeneratedKeys="true">
+    INSERT INTO buy_equipment(name, count, price, request_buy_record_id, lab_id, origin)
+    VALUES(#{name}, #{count}, #{price}, #{requestBuyRecordId}, #{labId}, #{origin})
+  </insert>
+
+  <select id="getByPagination" resultMap="equipment">
+    SELECT equipment.*,
+    lab.id AS lab_id,
+    lab.name AS lab_name
+    FROM equipment, lab 
+    WHERE (lab.name like #{keyword}
+      OR equipment.name like #{keyword}
+      OR equipment.origin like #{keyword}
+      OR equipment.id like #{keyword}
+    )
+    AND equipment.is_deleted = 0
+    AND equipment.lab_id = lab.id
+    <choose>
+      <when test="labId > 0">
+        AND lab_id = #{labId}
+      </when>
+    </choose>
+    ORDER BY equipment.created_at ${orderBy}
+    LIMIT #{start}, #{offset}
+  </select>
+
+  <select id="getCountBySearchWord" resultType="int">
+    SELECT count(1)
+    FROM equipment, lab 
+    WHERE (lab.name like #{keyword}
+      OR equipment.name like #{keyword}
+      OR equipment.origin like #{keyword}
+      OR equipment.id like #{keyword}
+    )
+    AND equipment.is_deleted = 0
+    AND equipment.lab_id = lab.id
+    <choose>
+      <when test="labId > 0">
+        AND lab_id = #{labId}
+      </when>
+    </choose>
+  </select>
+  
+  <insert id="insertEquipment" parameterType="top.yjzloveyzh.common.pojo.Equipment" keyProperty="id" useGeneratedKeys="true">
+    INSERT INTO equipment(name, origin, price, request_buy_record_id, lab_id, created_at, updated_at)
+    VALUES(#{name}, #{origin}, #{price}, #{requestBuyRecordId}, #{labId}, NOW(), NOW())
+  </insert>
+  
+  <update id="deleteEquipmentByIdArray">
+    UPDATE equipment
+    SET is_deleted = 1,
+      delete_record_id = #{deleteRecordId}
+    WHERE equipment.id in 
+        <foreach collection="idArray" item="id" index="index"  
+            open="(" close=")" separator=",">  
+            #{id}  
+        </foreach>    
+  </update>
+
+  <resultMap type="top.yjzloveyzh.common.pojo.Equipment" id="equipment">
+    <id column="id" property="id" />
+    <result column="name" property="name" />
+    <result column="origin" property="origin" />
+    <result column="price" property="price" />
+    <result column="lab_id" property="labId" />
+    <result column="created_at" property="createdAt" />
+    <result column="updated_at" property="updatedAt" />
+    <result column="is_deleted" property="isDeleted" />
+    <association property="lab" resultMap="lab"></association>
+  </resultMap>
+
+  <resultMap type="top.yjzloveyzh.common.pojo.RequestEquipment" id="request_equipment">
+    <id column="id" property="id" />
+    <result column="name" property="name" />
+    <result column="count" property="count" />
+    <result column="price" property="price" />
+    <result column="request_buy_record_id" property="requestBuyRecordId" />
+    <result column="lab_id" property="labId" />
+    <result column="origin" property="origin" />
+  </resultMap>
+
+  <resultMap type="top.yjzloveyzh.common.pojo.Lab" id="lab">
+    <id column="lab_id" property="id" />
+    <result column="lab_name" property="name" />
+  </resultMap>
+</mapper>

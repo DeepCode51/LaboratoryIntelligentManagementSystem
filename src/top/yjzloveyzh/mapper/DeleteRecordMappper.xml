@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.yjzloveyzh.dao.DeletedRecordDao">
+  <insert id="insertDeletedRecordByRecord" parameterType="top.yjzloveyzh.common.pojo.DeletedRecord" 
+    keyProperty="id" useGeneratedKeys="true">
+    INSERT INTO delete_record(user_id, created_at, updated_at)
+    VALUES(#{userId}, NOW(), NOW())
+  </insert>
+  
+  <select id="getDeletedRecordCount" resultType="int">
+  SELECT count(1)
+    FROM delete_record record, user user
+    WHERE record.user_id = user.id
+    AND user.id = #{requestUserId}
+    AND (user.name like #{keyword}
+      OR record.id like #{keyword}
+    )
+    AND record.is_deleted = 0
+  </select>
+  
+  <select id="getDeletedRecordPagination" resultMap="delete_record">
+    SELECT record.id AS record_id,
+      record.created_at as record_created_at,
+      record.updated_at as record_updated_at,
+      record.is_deleted as record_is_deleted,
+      record.is_allowed as record_is_allowed,
+      record.is_done as record_is_done,
+      record.user_id,
+      request_user.id as uid,
+      request_user.name as request_user_name
+    FROM delete_record record, user request_user
+    WHERE record.user_id = request_user.id
+    AND request_user.id = #{requestUserId}
+    AND (request_user.name like #{keyword}
+      OR record.id like #{keyword}
+    )
+    AND record.is_deleted = 0
+    ORDER BY record.created_at ${orderBy}
+    LIMIT #{start}, #{offset}
+  </select>
+
+  <resultMap type="top.yjzloveyzh.common.pojo.DeletedRecord" id="delete_record">
+    <id column="record_id" property="id" />
+    <result column="record_created_at" property="createdAt" />
+    <result column="record_updated_at" property="updatedAt" />
+    <result column="record_is_deleted" property="isDeleted" />
+    <result column="user_id" property="userId" />
+    <association property="user" resultMap="user"></association>
+  </resultMap>
+
+  <resultMap type="top.yjzloveyzh.common.pojo.User" id="user">
+    <id column="uid" property="id" />
+    <result column="request_user_name" property="name" />
+  </resultMap>
+</mapper>

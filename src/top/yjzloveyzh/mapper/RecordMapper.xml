@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.yjzloveyzh.dao.RecordDao">
+  <insert id="insertRequestRecordByRecord" parameterType="top.yjzloveyzh.common.pojo.RequestBuyRecord" keyProperty="id" useGeneratedKeys="true" keyColumn="id">
+      INSERT INTO
+      request_buy_record(created_at, updated_at, cost, request_user_id, title)
+      VALUES(NOW(), NOW(), #{cost}, #{requestedUserId}, #{title})
+  </insert>
+
+  <select id="getRequestBuyRecordPagination" resultMap="request_buy_record">
+    SELECT record.id AS record_id,
+      record.created_at as record_created_at,
+      record.updated_at as record_updated_at,
+      record.is_deleted as record_is_deleted,
+      record.is_allowed as record_is_allowed,
+      record.is_done as record_is_done,
+      record.title as record_title,
+      record.cost as record_cost,
+      record.allow_user_id,
+      record.request_user_id,
+      request_user.id as uid,
+      request_user.name as request_user_name
+    FROM request_buy_record record, user request_user
+    WHERE record.request_user_id = request_user.id
+    AND request_user.id = #{requestUserId}
+    AND (request_user.name like #{keyword}
+      OR record.title like #{keyword}
+    )
+    AND record.is_deleted = 0
+    ORDER BY record.created_at ${orderBy}
+    LIMIT #{start}, #{offset}
+  </select>
+
+  <select id="getRequestBuyRecordCount" resultType="int">
+    SELECT count(1)
+    FROM request_buy_record record, user request_user
+    WHERE record.request_user_id = request_user.id
+    AND request_user.id = #{requestUserId}
+    AND (request_user.name like #{keyword}
+      OR record.title like #{keyword}
+    )
+    AND record.is_deleted = 0
+  </select>
+
+  <select id="getNotReplyAllRequestBuyRecordCount" resultType="int">
+    SELECT count(1)
+    FROM request_buy_record record, user request_user
+    WHERE record.request_user_id = request_user.id
+    AND record.is_deleted = 0
+    AND (request_user.name like #{keyword}
+      OR record.title like #{keyword}
+    )
+    AND record.is_allowed = 0
+  </select>
+
+  <select id="getNotReplyRequestBuyRecordPagination" resultMap="request_buy_record">
+   SELECT record.id AS record_id,
+      record.created_at AS record_created_at,
+      record.updated_at AS record_updated_at,
+      record.is_deleted AS record_is_deleted,
+      record.is_allowed AS record_is_allowed,
+      record.is_done AS record_is_done,
+      record.cost AS record_cost,
+      record.title AS record_title,
+      record.allow_user_id,
+      record.request_user_id,
+      request_user.id AS uid,
+      request_user.name AS request_user_name,
+      buy_equipment.id AS bq_id,
+      buy_equipment.name AS bq_name,
+      buy_equipment.count AS bq_count,
+      buy_equipment.price AS bq_price,
+      buy_equipment.request_buy_record_id AS bq_buy_record_id,
+      buy_equipment.lab_id AS bq_lab_id,
+      buy_equipment.origin AS bq_origin
+    FROM request_buy_record record, user request_user, buy_equipment buy_equipment
+    WHERE record.request_user_id = request_user.id
+    AND (request_user.name like #{keyword}
+      OR record.title like #{keyword}
+    )
+    AND record.is_deleted = 0
+    AND record.is_allowed = 0
+    AND buy_equipment.request_buy_record_id = record.id
+    ORDER BY record.created_at ${orderBy}
+    LIMIT #{start}, #{offset}
+  </select>
+  
+  <select id="findRequestBuyRecordById" parameterType="int" resultMap="request_buy_record">
+    SELECT record.id AS record_id,
+      record.created_at AS record_created_at,
+      record.updated_at AS record_updated_at,
+      record.is_deleted AS record_is_deleted,
+      record.is_allowed AS record_is_allowed,
+      record.is_done AS record_is_done,
+      record.cost AS record_cost,
+      record.title AS record_title,
+      record.allow_user_id,
+      record.request_user_id,
+      request_user.id AS uid,
+      request_user.name AS request_user_name,
+      buy_equipment.id AS bq_id,
+      buy_equipment.name AS bq_name,
+      buy_equipment.count AS bq_count,
+      buy_equipment.price AS bq_price,
+      buy_equipment.request_buy_record_id AS bq_buy_record_id,
+      buy_equipment.lab_id AS bq_lab_id,
+      buy_equipment.origin AS bq_origin,
+      lab.id AS lab_id,
+      lab.name AS lab_name
+    FROM request_buy_record record, user request_user, buy_equipment buy_equipment, lab
+    WHERE record.is_deleted = 0
+    AND buy_equipment.request_buy_record_id = record.id
+    AND record.id = #{id}
+    AND lab.id = buy_equipment.lab_id
+  </select>
+
+  <select id="findRepliedBuyRecordById" parameterType="int" resultMap="request_buy_record_approved">
+    SELECT record.id AS record_id,
+      record.created_at AS record_created_at,
+      record.updated_at AS record_updated_at,
+      record.allowed_at AS record_allowed_at,
+      record.is_deleted AS record_is_deleted,
+      record.is_allowed AS record_is_allowed,
+      record.is_done AS record_is_done,
+      record.cost AS record_cost,
+      record.title AS record_title,
+      record.allow_user_id,
+      record.request_user_id,
+      request_user.id AS uid,
+      request_user.name AS request_user_name,
+      buy_equipment.id AS bq_id,
+      buy_equipment.name AS bq_name,
+      buy_equipment.count AS bq_count,
+      buy_equipment.price AS bq_price,
+      buy_equipment.request_buy_record_id AS bq_buy_record_id,
+      buy_equipment.lab_id AS bq_lab_id,
+      buy_equipment.origin AS bq_origin,
+      apply_user.id AS apply_user_id,
+      apply_user.name AS apply_user_name,
+      lab.id AS lab_id,
+      lab.name AS lab_name
+    FROM request_buy_record record, user request_user, buy_equipment buy_equipment, lab, user apply_user
+    WHERE record.is_deleted = 0
+    AND buy_equipment.request_buy_record_id = record.id
+    AND record.id = #{id}
+    AND lab.id = buy_equipment.lab_id
+    AND record.allow_user_id = apply_user.id
+  </select>
+
+  <update id="updateRequestBuyRecordAllowedById">
+    UPDATE request_buy_record
+    SET is_allowed = #{operation},
+      allow_user_id = #{allow_user_id},
+      allowed_at = NOW(),
+      updated_at = NOW()
+    WHERE request_buy_record.id = #{recordId}
+  </update>
+
+  <select id="getRepliedRequestBuyRecordCount" resultType="int">
+    SELECT count(1)
+    FROM request_buy_record record, user apply_user, user request_user
+    WHERE record.request_user_id = request_user.id
+    AND record.allow_user_id = apply_user.id
+    AND record.is_deleted = 0
+    AND (request_user.name like #{keyword}
+      OR record.title like #{keyword}
+      OR apply_user.name like #{keyword}
+    )
+    AND <![CDATA[ record.is_allowed <> 0 ]]>
+  </select>
+
+  <select id="getRepliedRequestBuyRecordPagination" resultMap="request_buy_record_approved">
+    SELECT record.id AS record_id,
+      record.created_at AS record_created_at,
+      record.updated_at AS record_updated_at,
+      record.allowed_at AS record_allowed_at,
+      record.is_deleted AS record_is_deleted,
+      record.is_allowed AS record_is_allowed,
+      record.is_done AS record_is_done,
+      record.cost AS record_cost,
+      record.title AS record_title,
+      record.allow_user_id,
+      record.request_user_id,
+      request_user.id AS uid,
+      request_user.name AS request_user_name,
+      buy_equipment.id AS bq_id,
+      buy_equipment.name AS bq_name,
+      buy_equipment.count AS bq_count,
+      buy_equipment.price AS bq_price,
+      buy_equipment.request_buy_record_id AS bq_buy_record_id,
+      buy_equipment.lab_id AS bq_lab_id,
+      buy_equipment.origin AS bq_origin,
+      apply_user.id AS apply_user_id,
+      apply_user.name AS apply_user_name
+    FROM request_buy_record record, user request_user, buy_equipment buy_equipment, user apply_user
+    WHERE record.request_user_id = request_user.id
+    AND record.allow_user_id = apply_user.id
+    AND (request_user.name like #{keyword}
+      OR record.title like #{keyword}
+    )
+    AND record.is_deleted = 0
+    AND <![CDATA[ record.is_allowed <> 0 ]]>
+    AND buy_equipment.request_buy_record_id = record.id
+    ORDER BY record.created_at ${orderBy}
+    LIMIT #{start}, #{offset}
+  </select>
+
+  <resultMap type="top.yjzloveyzh.common.pojo.RequestBuyRecord" id="request_buy_record">
+    <id column="record_id" property="id" />
+    <result column="record_created_at" property="createAt" />
+    <result column="record_updated_at" property="updateAt" />
+    <result column="record_updated_at" property="updateAt" />
+    <result column="record_is_deleted" property="isDeleted" />
+    <result column="record_is_allowed" property="isAllowed" />
+    <result column="record_is_done" property="isDone" />
+    <result column="record_cost" property="cost" />
+    <result column="allow_user_id" property="allowedUserId" />
+    <result column="request_user_id" property="requestedUserId" />
+    <result column="record_title" property="title" />
+    <association property="requestedUser" resultMap="request_user"></association>
+    <collection property="equipments" resultMap="request_equipment"></collection>
+  </resultMap>
+
+  <resultMap type="top.yjzloveyzh.common.pojo.RequestBuyRecord" id="request_buy_record_approved">
+    <id column="record_id" property="id" />
+    <result column="record_created_at" property="createAt" />
+    <result column="record_updated_at" property="updateAt" />
+    <result column="record_allowed_at" property="allowAt" />
+    <result column="record_is_deleted" property="isDeleted" />
+    <result column="record_is_allowed" property="isAllowed" />
+    <result column="record_is_done" property="isDone" />
+    <result column="record_cost" property="cost" />
+    <result column="allow_user_id" property="allowedUserId" />
+    <result column="request_user_id" property="requestedUserId" />
+    <result column="record_title" property="title" />
+    <association property="requestedUser" resultMap="request_user"></association>
+    <association property="allowedUser" resultMap="allowed_user"></association>
+    <collection property="equipments" resultMap="request_equipment"></collection>
+  </resultMap>
+
+  <resultMap type="top.yjzloveyzh.common.pojo.User" id="request_user">
+    <id column="uid" property="id" />
+    <result column="request_user_name" property="name" />
+  </resultMap>
+  
+  <resultMap type="top.yjzloveyzh.common.pojo.User" id="allowed_user">
+    <id column="apply_user_id" property="id" />
+    <result column="apply_user_name" property="name" />
+  </resultMap>
+
+  <resultMap type="top.yjzloveyzh.common.pojo.RequestEquipment" id="request_equipment">
+    <id column="bq_id" property="id" />
+    <result column="bq_name" property="name" />
+    <result column="bq_count" property="count" />
+    <result column="bq_price" property="price" />
+    <result column="bq_buy_record_id" property="requestBuyRecordId" />
+    <result column="bq_lab_id" property="labId" />
+    <result column="bq_origin" property="origin" />
+    <association property="lab" resultMap="lab"></association>
+  </resultMap>
+
+  <resultMap type="top.yjzloveyzh.common.pojo.Lab" id="lab">
+    <id column="lab_id" property="id" />
+    <result column="lab_name" property="name" />
+  </resultMap>
+</mapper>

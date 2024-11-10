@@ -1,0 +1,78 @@
+* {
+  margin: 0px;
+  padding: 0px;
+  font-size: 14px;
+}
+
+.content {
+  margin-top: 70px;
+  height: 100%;
+  padding-bottom: 140px;
+}
+
+.table-div {
+  width: 80%;
+  margin: 0 auto;
+}
+
+.table-title {
+  display: block;
+  height: 45px;
+  padding-left: 10px;
+  background-color: #0ccff2;
+}
+
+.table-title span {
+  font-size: 18px;
+  font-weight: bold;
+  line-height: 45px;
+}
+
+.breadcrumb {
+  margin-left: 10%;
+  width: 80%;
+}
+
+.table-add-div {
+  width: 80%;
+  margin: 7px auto;
+}
+
+.btn-circle {
+  width: 30px;
+  height: 30px;
+  float: right;
+  cursor: pointer;
+}
+
+.commit-div {
+  height: 60px;
+  width: 80%;
+  margin: 45px auto;
+  text-align: center;
+}
+
+.btn-commit {
+  margin-left: 30px;
+}
+
+.delete-img {
+  width: 22px;
+  height: 22px;
+  cursor: pointer;
+}
+
+.buy-equipment-table {
+  width: 80%;
+  margin-left: 10%;
+  margin-top: 50px;
+}
+
+.text-left {
+  text-align: left !important;
+}
+
+.alert {
+  width: 80%;
+  margin: 0 auto;
+}

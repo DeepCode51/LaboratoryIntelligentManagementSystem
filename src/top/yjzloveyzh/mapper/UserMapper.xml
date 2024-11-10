@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="top.yjzloveyzh.dao.LabUserDao">
+
+  <insert id="insertLabUser" parameterType="top.yjzloveyzh.common.pojo.User"
+      keyProperty="id" useGeneratedKeys="true">
+      INSERT INTO
+      user(username, password, permission, email)
+      VALUES(#{username}, #{password}, #{permission}, #{email})
+  </insert>
+
+  <select id="findUserByUserName" parameterType="String"
+      resultMap="user">
+      SELECT user.*, role.id as role_id, role.name as role_name,permission.id as permission_id, permission.name as permission_name,permission.role_id as p_role_id 
+      FROM user 
+      LEFT JOIN role
+      ON user.role_id = role.id
+      LEFT JOIN permission
+      ON permission.role_id = role.id
+      WHERE user.username = #{username} AND user.is_deleted = 0
+  </select>
+
+  <select id="findUserById" parameterType="int" resultMap="user">
+      SELECT user.*, role.id as role_id, role.name as role_name,permission.id as permission_id, permission.name as permission_name,permission.role_id as p_role_id 
+      FROM user 
+      LEFT JOIN role
+      ON USER.role_id = role.id
+      LEFT JOIN permission
+      ON permission.role_id = role.id
+      WHERE USER.id = #{id} AND USER.is_deleted = 0
+  </select>
+  
+  <update id="editByUser" parameterType="top.yjzloveyzh.common.pojo.User">
+    UPDATE user
+    SET gender = #{gender}, name = #{name}, area = #{area}, address = #{address}, tel_phone = #{telPhone}, zip_code = #{zipCode}, email = #{email}
+    WHERE id = #{id}
+  </update>
+
+  <select id="getUserToken" resultType="String">
+    SELECT user.token
+    FROM user
+    WHERE user.id = #{id}
+  </select>
+
+  <select id="getTokenByUsername" resultType="String">
+    SELECT user.token
+    FROM user
+    WHERE user.username = #{username}
+  </select>
+  
+  <update id="updateUserToken">
+    UPDATE user
+    SET token = #{token}
+    WHERE id = #{id}
+  </update>
+
+  <resultMap type="top.yjzloveyzh.common.pojo.User" id="user">
+    <id column="id" property="id" />
+    <result column="username" property="username" />
+    <result column="password" property="password" />
+    <result column="gender" property="gender" />
+    <result column="email" property="email" />
+    <result column="name" property="name" />
+    <result column="address" property="address" />
+    <result column="area" property="area" />
+    <result column="tel_phone" property="telPhone" />
+    <result column="zip_code" property="zipCode" />
+    <result column="token" property="token" />
+    <association property="role" javaType="top.yjzloveyzh.common.pojo.Role" resultMap="role"></association>
+  </resultMap>
+
+  <resultMap type="top.yjzloveyzh.common.pojo.Role" id="role">
+    <id column="role_id" property="id" />
+    <result column="role_name" property="name" />
+    <collection property="permissions" ofType="top.yjzloveyzh.common.pojo.Permission"></collection>
+  </resultMap>
+
+  <resultMap type="top.yjzloveyzh.common.pojo.Permission" id="permission">
+    <id column="permission_id" property="id" />
+    <result column="permission_name" property="name" />
+    <result column="p_role_id" property="roleId" />
+  </resultMap>
+</mapper>

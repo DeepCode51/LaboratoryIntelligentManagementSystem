@@ -1,0 +1,28 @@
+@CHARSET "UTF-8";
+
+* {
+  margin: 0;
+  padding: 0;
+  font-size: 14px;
+}
+
+.form-control {
+  width: 40%;
+  display: inline-block;
+}
+
+.userinfo {
+  width: 80%;
+  margin: 70px auto;
+}
+
+td {
+  vertical-align: middle !important;
+}
+
+.table .message-input {
+  font-family: Tahoma, Verdana, 宋体;
+  font-size: 12px;
+  line-height: 15px;
+  color: #000000;
+}

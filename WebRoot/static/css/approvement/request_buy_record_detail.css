@@ -1,0 +1,46 @@
+@CHARSET "UTF-8";
+
+* {
+  margin: 0px;
+  padding: 0px;
+  font-size: 14px;
+}
+
+.content {
+  margin-top: 70px;
+  height: 100%;
+  padding-bottom: 140px;
+}
+
+.breadcrumb {
+  margin-left: 10%;
+  width: 80%;
+  margin: 0 auto;
+}
+
+.buy-equipment-table {
+  width: 60%;
+  margin: 0 auto;
+  margin-top: 30px;
+}
+
+.td-input {
+  width: 80%;
+}
+
+.text-left {
+  text-align: left !important;
+}
+
+.opeartion-btns {
+  margin-top: 20px;
+}
+
+.ml {
+  margin-left: 15px;
+}
+
+.alert {
+  width: 80%;
+  margin: 20px auto;
+}
